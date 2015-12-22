@@ -1,0 +1,121 @@
+Dim swApp As Object
+Dim swModel As SldWorks.ModelDoc2
+Dim swCustMgr As SldWorks.CustomPropertyManager
+
+Dim vCustNames As Variant
+Dim vCustTypes As Variant
+Dim vCustVals As Variant
+Dim PN As String
+Dim PN2 As String
+Dim OverwriteExisting As Integer
+Dim VAL As Integer
+
+Sub main()
+    Set swApp = Application.SldWorks
+    Set swModel = swApp.ActiveDoc
+    If swModel Is Nothing Then MsgBox "A Part or Assembly file must be open", vbExclamation: End
+    Set swCustPropMgr = swModel.Extension.CustomPropertyManager(Empty)
+      
+'------------------------------------------------------------------------------------------------------------------
+Set swCustPropMgr = swModel.Extension.CustomPropertyManager("")
+Set swCustMgr = swModel.Extension.CustomPropertyManager("")
+ 
+'Deletes existing proporties
+'swCustPropMgr.Delete "Description"
+swCustPropMgr.Delete "PartNo"
+swCustPropMgr.Delete "Revision"
+swCustPropMgr.Delete "MASS"
+swCustPropMgr.Delete "Material"
+swCustPropMgr.Delete "Finish"
+swCustPropMgr.Delete "CheckedBy"
+swCustPropMgr.Delete "CheckedDate"
+swCustPropMgr.Delete "DrawnBy"
+swCustPropMgr.Delete "DrawnDate"
+swCustPropMgr.Delete "EngineeringApproval"
+swCustPropMgr.Delete "EngAppDate"
+swCustPropMgr.Delete "REVADRAWN"
+swCustPropMgr.Delete "REVACHECKED"
+swCustPropMgr.Delete "REVACOMMENT"
+swCustPropMgr.Delete "REVADATE"
+ 
+'Adds new custom proporties
+swCustPropMgr.Add2 "Description", swCustomInfoText, ""
+swModel.AddCustomInfo2 "PartNo", swCustomInfoText, UCase(Left(swModel.GetTitle, 11))
+'swCustPropMgr.Add2 "PartNo", swCustomInfoText, InputBox("ENTER PART NUMBER")
+swCustPropMgr.Add2 "Revision", swCustomInfoText, InputBox("ENTER CURRENT REVISION")
+swCustPropMgr.Add2 "MASS", swCustomInfoText, """SW-Mass@Part1.SLDPRT""kg "
+swCustPropMgr.Add2 "Material", swCustomInfoText, """SW-Material@Part1.SLDPRT"""
+swCustPropMgr.Add2 "Finish", swCustomInfoText, "CLEAN & REMOVE ALL BURRS"
+swCustPropMgr.Add2 "REVADRAWN", swCustomInfoText, "JLH"
+swCustPropMgr.Add2 "REVACHECKED", swCustomInfoText, "SD"
+swCustPropMgr.Add2 "REVACOMMENT", swCustomInfoText, "ASBUILTS & GENERAL DRAWING UPDATES"
+swCustPropMgr.Add2 "REVADATE", swCustomInfoText, Date
+swCustPropMgr.Add2 "REVBDRAWN", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVBCHECKED", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVBCOMMENT", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVBDATE", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVCDRAWN", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVCCHECKED", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVCCOMMENT", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVCDATE", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVDDRAWN", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVDCHECKED", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVDCOMMENT", swCustomInfoText, ""
+swCustPropMgr.Add2 "REVDDATE", swCustomInfoText, ""
+swCustPropMgr.Add2 "REV1", swCustomInfoText, "1"
+swCustPropMgr.Add2 "REV2", swCustomInfoText, "2"
+swCustPropMgr.Add2 "REV3", swCustomInfoText, "3"
+swCustPropMgr.Add2 "REV4", swCustomInfoText, "4"
+
+vConfName = swModel.GetConfigurationNames
+swCustMgr.GetAll vCustNames, vCustTypes, vCustVals
+    
+    For indexa = 0 To UBound(vConfName)
+    For indexb = 0 To UBound(vCustNames)
+    
+        Set swConfig = swModel.GetConfigurationByName(vConfName(indexa))
+                        'Custprop = swModel.DeleteCustomInfo2(vConfName(i), "Description")
+                        Custprop = swModel.DeleteCustomInfo2(vConfName(indexa), "Material")
+                        Custprop = swModel.DeleteCustomInfo2(vConfName(indexa), "Revision")
+    
+    If swModel.CustomInfo("Description") = "" Then
+    PN2 = swModel.CustomInfo2(vConfName(indexa), "Description")
+    swCustPropMgr.Set "Description", PN2
+    VAL = swCustMgr.Set2("Description", PN2)
+    
+    End If
+    Custprop = swModel.DeleteCustomInfo2(vConfName(i), "Description")
+    
+    Next indexb
+    Next indexa
+    
+    'MsgBox (PN2)
+
+'Check and Add/Update DESCRIPTION Property
+'VAL = swCustMgr.Add3("Description", swCustomInfoType_e.swCustomInfoText, "", OverwriteExisting)
+'MsgBox (VAL)
+swCustMgr.GetAll vCustNames, vCustTypes, vCustVals
+For i = 0 To UBound(vCustNames)
+    If vCustNames(i) = "Description" Then
+    PN = UCase(vCustVals(i))
+    swCustPropMgr.Set "Description", PN
+    VAL = swCustMgr.Set2("Description", PN)
+    End If
+Next i
+
+    If swModel.CustomInfo("Description") = "" Then
+        swCustPropMgr.Set "Description", UCase(InputBox("ENTER DESCRIPTION"))
+        End If
+
+'MsgBox " Custom Property data updated."
+'MsgBox (PN)
+Dim Msg As String
+
+Msg = "Custom property data updated" & vbNewLine
+Msg = Msg & PN & vbNewLine
+Msg = Msg & PN2 & vbNewLine
+
+MsgBox Msg, , "yay"
+Set swApp = Application.SldWorks
+End Sub
+
