@@ -1,0 +1,2 @@
+# swmacros
+solidworks macros
